@@ -20,7 +20,8 @@ export class AppServer {
         // SETUP EXPRESS
         // -------------------------------------------------------------
         this.app = express();
-        this.app.use(bodyParser.json());
+        this.app.use(bodyParser.json())
+                .use(express.static("html"));
         // TODO: redis for session store
         if (this.app.get("env") === "production") {
             this.app.set("trust proxy", 1);
