@@ -8,13 +8,13 @@ export class GithubClient {
     constructor(access_token: string) {
         this.token = access_token;
     }
-    get_oauth_url(): string {
+    get_oauth_url(state: string): string {
         const client_id = encodeURIComponent(process.env.APP_GH_OAUTH_CLIENTID);
         const redirect = encodeURIComponent(process.env.APP_SERVER_BASE + "gh-oauth");
-        const url = `https://github.com/login/oauth/authorize?scope=repo&client_id=${client_id}&redirect_uri=${redirect}`;
+        const url = `https://github.com/login/oauth/authorize?scope=repo&client_id=${client_id}&redirect_uri=${redirect}&state=${state}`;
         return url;
     }
-    get_access_token(code: string, cb: ((token: string) => void)) {
+    get_access_token(code: string, state: string, cb: ((token: string) => void)) {
         const options = {
             url: "https://github.com/login/oauth/access_token",
             method: "POST",
@@ -24,7 +24,8 @@ export class GithubClient {
             form: {
                 client_id: process.env.APP_GH_OAUTH_CLIENTID,
                 client_secret: process.env.APP_GH_OAUTH_SECRET,
-                code: code
+                code: code,
+                state: state
             }
         };
         request(options, (err, response, body) => {

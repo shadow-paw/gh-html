@@ -2,6 +2,7 @@ import * as express from "express";
 import * as request from "request";
 import * as qs from "query-string";
 import * as path from "path";
+import * as crypto from "crypto";
 import { AppServer } from "../server";
 import { GithubClient } from "../github";
 
@@ -20,8 +21,9 @@ function gh_oauth_get(req: express.Request, res: express.Response) {
     if ("code" in req.query) {
         const code = req.query.code;
         const gh = new GithubClient("");
-        gh.get_access_token(code, (access_token: string) => {
+        gh.get_access_token(code, req.session.oauth_state, (access_token: string) => {
             if (access_token) {
+                delete req.session.oauth_state;
                 req.session.gh_token = access_token;
                 res.redirect("./");
             } else {
@@ -30,7 +32,10 @@ function gh_oauth_get(req: express.Request, res: express.Response) {
         });
     } else {
         const gh = new GithubClient("");
-        res.redirect(gh.get_oauth_url());
+        const secret = crypto.randomBytes(16);
+        const oauth_state = Buffer.from(secret).toString("hex");
+        req.session.oauth_state = oauth_state;
+        res.redirect(gh.get_oauth_url(oauth_state));
     }
 }
 // EXPORTS
