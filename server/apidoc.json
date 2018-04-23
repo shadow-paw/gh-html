@@ -1,0 +1,8 @@
+{
+    "name": "Messenger",
+    "version": "0.0.1",
+    "description": "Secure messenger for everyone",
+    "template": {
+        "forceLanguage": "en"
+    }
+}
