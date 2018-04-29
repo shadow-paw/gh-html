@@ -1,3 +1,9 @@
+env:
+  global:
+    # GITHUB Personal Access Token with repo access.
+    # To generate a new token, run travis encrypt GITHUB_TOKEN=your_token
+    # NOTE: Maybe we can try using a deploy key instead to limit access.
+    - secure: "yb4jUBr2kq59TSMXFu8ChsWR/llqvfJyqFE04bkCKy4QElAHuMQRNYWLkN8XDt6wZ72a2N3sFQjhRxXy7hvZUGVx2WIXSvzr2xZU42WyX/z1xU1N8vbeDlhX2b/DBRRtyVXPuFzUMc4ig7iaWVNGzKBc3av5o0w2zxKgmip11bLLZS5J6CgTB+SdouQF2/zDU3dOcVaJ0petjofBET/xmYy5fC3R5hlTZz3ZXo06P3Qj/hcNPV5EFqbRFA/KMZPfI17kS74jakRWTQv2nNoA1tiOvq4Fs85wsoVkwVEq+qopLpKmNMI/5WHblPmAlY7JQZmHIcz0l1LYwBznw2kwLkOjbmKwxO7fKojd4SydzU3+h0Crxx2KHLObgEC8JDs1SzidVXjuL70H8qQKRuf2XVxFgSS5O4VE8VeLSiWLMhNVL1wcCObXvCCV/g+sqLVFaFlHu691iuGbVV13aj9eP35ie6Eehb0mOUemfl/DCIoZGSYO8Prv9k/7kdcvU6eAjlD3urt21C8oTFtZtK5XtbTy7JMh6QwYJL42p0fCd4Coml3yPyXaH06R0rwjZRiKUcVb7ukL1cLbXFQqQws5Pu6ojFAd7syo+2wqlUrJ7A2nJi33YWGN5m+0/Irkmg3PsE/M1IheRnD8grzMOpKAM9/100M4+bNa/Jh+sTII5Aw="
 branches:
   only:
     - master
@@ -6,15 +12,32 @@ matrix:
     # server
     - language: node_js
       node_js:
-        - "9"
-      cache:
-        timeout: 300
-        directories:
-        - "backend/node_modules"
+      - "9"
       install:
         - (cd server && npm install)
       script:
         - (cd server && make build)
+
+    # apidoc
+    - language: node_js
+      node_js: "9"
+      if: branch = master AND type = push
+      install:
+        - npm install apidoc -g
+      script:
+        - (cd server && apidoc -i src/ -o ../apidoc/)
+      deploy:
+        edge: # https://github.com/travis-ci/travis-ci/issues/9312
+          branch: v1.8.47
+        provider: pages
+        github-token: $GITHUB_TOKEN
+        target-branch: gh-html
+        skip-cleanup: true
+        keep-history: false
+        local-dir: apidoc
+        verbose: true
+        on:
+          branch: master
 
 notifications:
   email: false
