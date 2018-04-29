@@ -10,7 +10,7 @@ matrix:
       cache:
         timeout: 300
         directories:
-        - "backend/node_modules"
+        - $HOME/.npm
       install:
         - (cd server && npm install)
       script:
