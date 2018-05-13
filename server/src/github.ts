@@ -41,30 +41,6 @@ export class GithubClient {
             }
         });
     }
-    user_repo(cb: ((json: any) => void)) {
-        const options = {
-            url: "https://api.github.com/user/repos",
-            method: "GET",
-            headers: {
-                "Accept": "application/vnd.github.v3+json",
-                "User-Agent": "shadow-paw/gh-html",
-                "Authorization": "token " + this.token
-            }
-        };
-        request(options, (err, response, body) => {
-            if (err) {
-                cb(undefined);
-            } else {
-                let repos = undefined;
-                try {
-                    repos = JSON.parse(body);
-                } catch (e) {
-                    // ignore
-                }
-                cb(repos);
-            }
-        });
-    }
     user_file(owner: string, repo: string, branch: string, file: string, cb: ((code: number, data: any) => void)) {
         // console.log(`GITHUB GET FILE: owner: ${owner}, repo: ${repo}, branch: ${branch}, file: ${file}`);
         owner = encodeURIComponent(owner);
