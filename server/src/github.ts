@@ -10,7 +10,7 @@ export class GithubClient {
     }
     get_oauth_url(state: string): string {
         const client_id = encodeURIComponent(process.env.APP_GH_OAUTH_CLIENTID);
-        const redirect = encodeURIComponent(process.env.APP_SERVER_BASE + "gh-oauth");
+        const redirect = encodeURIComponent(process.env.APP_SERVER_BASE + "/auth-github");
         const url = `https://github.com/login/oauth/authorize?scope=repo&client_id=${client_id}&redirect_uri=${redirect}&state=${state}`;
         return url;
     }
@@ -83,7 +83,9 @@ export class GithubClient {
         };
         request(options, (err, response, body) => {
             if (err) {
-                cb("");
+                cb(undefined);
+            } else if (body == '{"message":"Not Found","documentation_url":"https://developer.github.com/v3/repos/contents/#get-contents"}') {
+                cb(undefined);
             } else {
                 cb(body);
             }

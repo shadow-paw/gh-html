@@ -10,22 +10,24 @@ import { GithubClient } from "../github";
 module.exports = (function() {
 // -----------------------------------------------------------------
 /**
- * @api {get} /gh-oauth OAuth callback
+ * @api {get} /auth-github OAuth callback
  * @apiVersion 0.0.1
  * @apiName gh-oauth
  * @apiGroup auth
- * @apiDescription Github OAuth callback, acquire access token then redirect back to /.
+ * @apiDescription Github OAuth callback, acquire access token then redirect back to session.returning_url or "./"
  */
-function gh_oauth_get(req: express.Request, res: express.Response) {
-    const self: AppServer = this;
+function auth_github(req: express.Request, res: express.Response) {
+    // const self: AppServer = this;
     if ("code" in req.query) {
         const code = req.query.code;
         const gh = new GithubClient("");
         gh.get_access_token(code, req.session.oauth_state, (access_token: string) => {
             if (access_token) {
+                const returning_url = req.session.returning_url || "./";
                 delete req.session.oauth_state;
+                delete req.session.returning_url;
                 req.session.gh_token = access_token;
-                res.redirect("./");
+                res.redirect(returning_url);
             } else {
                 res.status(403).send("error");
             }
@@ -41,7 +43,7 @@ function gh_oauth_get(req: express.Request, res: express.Response) {
 // EXPORTS
 // -----------------------------------------------------------------
 return {
-    "uri": "/gh-oauth",
-    "get": gh_oauth_get
+    "uri": "/auth-github",
+    "get": auth_github
 };
 }());
