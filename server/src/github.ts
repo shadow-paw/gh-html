@@ -67,7 +67,10 @@ export class GithubClient {
     }
     user_file(owner: string, repo: string, branch: string, file: string, cb: ((data: any) => void)) {
         // console.log(`GITHUB GET FILE: owner: ${owner}, repo: ${repo}, branch: ${branch}, file: ${file}`);
-
+        owner = encodeURIComponent(owner);
+        repo = encodeURIComponent(repo);
+        file = encodeURI(file).replace("@", "%40");
+        branch = encodeURIComponent(branch);
         const options = {
             url: `https://api.github.com/repos/${owner}/${repo}/contents/${file}?ref=${branch}`,
             method: "GET",
