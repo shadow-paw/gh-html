@@ -27,7 +27,7 @@ function repo_proxy(req: express.Request, res: express.Response) {
 
     const gh = new GithubClient(req.session.gh_token);
     gh.user_file(owner, repo, branch, file, (data: any) => {
-        res.type(mime.contentType(file) || "text/html");
+        res.type(mime.lookup(file) || "text/html");
         res.send(data);
     });
 }
