@@ -65,7 +65,7 @@ export class GithubClient {
             }
         });
     }
-    user_file(owner: string, repo: string, branch: string, file: string, cb: ((data: any) => void)) {
+    user_file(owner: string, repo: string, branch: string, file: string, cb: ((code: number, data: any) => void)) {
         // console.log(`GITHUB GET FILE: owner: ${owner}, repo: ${repo}, branch: ${branch}, file: ${file}`);
         owner = encodeURIComponent(owner);
         repo = encodeURIComponent(repo);
@@ -83,11 +83,11 @@ export class GithubClient {
         };
         request(options, (err, response, body) => {
             if (err) {
-                cb(undefined);
-            } else if (body == '{"message":"Not Found","documentation_url":"https://developer.github.com/v3/repos/contents/#get-contents"}') {
-                cb(undefined);
+                cb(404, undefined);
+            } else if (response.statusCode < 200 || response.statusCode >= 300) {
+                cb(response.statusCode, undefined);
             } else {
-                cb(body);
+                cb(response.statusCode, body);
             }
         });
     }

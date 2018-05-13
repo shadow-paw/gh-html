@@ -35,12 +35,12 @@ function repo_proxy(req: express.Request, res: express.Response) {
     const branch = fields[4];
     const file = fields.slice(5).join("/");
     const gh = new GithubClient(req.session.gh_token);
-    gh.user_file(owner, repo, branch, file, (data: any) => {
+    gh.user_file(owner, repo, branch, file, (code: number, data: any) => {
         if (data) {
             res.type(mime.lookup(file) || "text/html");
-            res.send(data);
+            res.status(code).send(data);
         } else {
-            res.status(404).send("Not found");
+            res.status(code).send("Not found");
         }
     });
 }
