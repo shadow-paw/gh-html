@@ -3,6 +3,7 @@ import * as mime from "mime-types";
 import * as crypto from "crypto";
 import { AppServer } from "../server";
 import { GithubClient } from "../github";
+import { SessionData } from "../model/session";
 
 
 module.exports = (function() {
@@ -15,16 +16,18 @@ module.exports = (function() {
  * @apiDescription Fetch a file from repo, indicated by uri.
  */
 function repo_proxy(req: express.Request, res: express.Response) {
-    // const self: AppServer = this;
     // console.log(`repo_proxy: ${req.originalUrl}`);
-    if (!req.session.gh_token) {
+    // const self: AppServer = this;
+    const session = SessionData.bind(req.session);
+
+    if (!session.access_token) {
         // Redirect to github oauth if not logged in already
-        req.session.returning_url = process.env.APP_SERVER_BASE + req.originalUrl;
-        const gh = new GithubClient("");
+        session.returning_url = process.env.APP_SERVER_BASE + req.originalUrl;
+        const github = new GithubClient("");
         const secret = crypto.randomBytes(16);
         const oauth_state = Buffer.from(secret).toString("hex");
-        req.session.oauth_state = oauth_state;
-        res.redirect(gh.get_oauth_url(oauth_state));
+        session.oauth_state = oauth_state;
+        res.redirect(github.get_oauth_url(oauth_state));
         return;
     }
 
@@ -34,8 +37,8 @@ function repo_proxy(req: express.Request, res: express.Response) {
     const repo = fields[3];
     const branch = fields[4];
     const file = fields.slice(5).join("/");
-    const gh = new GithubClient(req.session.gh_token);
-    gh.user_file(owner, repo, branch, file, (code: number, data: any) => {
+    const github = new GithubClient(session.access_token);
+    github.user_file(owner, repo, branch, file, (code: number, data: any) => {
         if (data) {
             res.type(mime.lookup(file) || "text/html");
             res.status(code).send(data);
