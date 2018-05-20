@@ -11,14 +11,14 @@ import { SessionData } from "../model/session";
 module.exports = (function() {
 // -----------------------------------------------------------------
 /**
- * @api {get} /auth-github OAuth callback
+ * @api {get} /auth/github OAuth callback
  * @apiVersion 0.0.1
  * @apiName gh-oauth
  * @apiGroup auth
- * @apiDescription Github OAuth callback, acquire access token then redirect back to session.returning_url or "./"
+ * @apiDescription Github OAuth callback, acquire access token then redirect back to session.returning_url or "../"
  */
 function auth_github(req: express.Request, res: express.Response) {
-    const github = new GithubClient("");
+    const github = new GithubClient();
     const session = SessionData.bind(req.session);
 
     // const self: AppServer = this;
@@ -26,7 +26,7 @@ function auth_github(req: express.Request, res: express.Response) {
         const code = req.query.code;
         github.get_access_token(code, session.oauth_state, (access_token: string) => {
             if (access_token) {
-                const returning_url = session.returning_url || "./";
+                const returning_url = session.returning_url || "../";
                 delete session.oauth_state;
                 delete session.returning_url;
                 session.access_token = access_token;
@@ -39,13 +39,13 @@ function auth_github(req: express.Request, res: express.Response) {
         const secret = crypto.randomBytes(16);
         const oauth_state = Buffer.from(secret).toString("hex");
         session.oauth_state = oauth_state;
-        res.redirect(github.get_oauth_url(oauth_state));
+        res.redirect(github.oauth_url(oauth_state));
     }
 }
 // EXPORTS
 // -----------------------------------------------------------------
 return {
-    "uri": "/auth-github",
+    "uri": "/auth/github",
     "get": auth_github
 };
 }());

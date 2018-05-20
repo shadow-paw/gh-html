@@ -11,11 +11,11 @@ module.exports = (function() {
 /**
  * @api {get} /proxy/{owner}/{repo}/{branch}/{path}/{file} Access repo file
  * @apiVersion 0.0.1
- * @apiName get
+ * @apiName file
  * @apiGroup repo
  * @apiDescription Fetch a file from repo, indicated by uri.
  */
-function repo_proxy(req: express.Request, res: express.Response) {
+function proxy_get(req: express.Request, res: express.Response) {
     // console.log(`repo_proxy: ${req.originalUrl}`);
     // const self: AppServer = this;
     const session = SessionData.bind(req.session);
@@ -23,11 +23,11 @@ function repo_proxy(req: express.Request, res: express.Response) {
     if (!session.access_token) {
         // Redirect to github oauth if not logged in already
         session.returning_url = process.env.APP_SERVER_BASE + req.originalUrl;
-        const github = new GithubClient("");
+        const github = new GithubClient();
         const secret = crypto.randomBytes(16);
         const oauth_state = Buffer.from(secret).toString("hex");
         session.oauth_state = oauth_state;
-        res.redirect(github.get_oauth_url(oauth_state));
+        res.redirect(github.oauth_url(oauth_state));
         return;
     }
 
@@ -38,7 +38,7 @@ function repo_proxy(req: express.Request, res: express.Response) {
     const branch = fields[4];
     const file = fields.slice(5).join("/");
     const github = new GithubClient(session.access_token);
-    github.user_file(owner, repo, branch, file, (code: number, data: any) => {
+    github.get_user_file(owner, repo, branch, file, (code: number, data: any) => {
         if (data) {
             res.type(mime.lookup(file) || "text/html");
             res.status(code).send(data);
@@ -51,6 +51,6 @@ function repo_proxy(req: express.Request, res: express.Response) {
 // -----------------------------------------------------------------
 return {
     "uri": "/proxy/*",
-    "get": repo_proxy
+    "get": proxy_get
 };
 }());

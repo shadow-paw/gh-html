@@ -16,7 +16,9 @@
     <div class="nav-wrapper">
       <span class="grey-text text-lighten-4 app-title">GH-HTML</span>
       <ul id="nav-mobile" class="right">
-        <li><a href="#!"><i class="material-icons left">power_settings_new</i></a></li>
+        <li><span id="welcome" style="display: none;"></span></li>
+        <li><a id="login" href="#!" style="display: none;"><i class="material-icons left">fingerprint</i>Login</a></li>
+        <li><a id="logout" href="#!" style="display: none;"><i class="material-icons left">power_settings_new</i>Logout</a></li>
       </ul>
     </div>
     <div class="nav-content">
@@ -26,6 +28,7 @@
       </ul>
     </div>
 </nav>
+<div id="body-content" style="display: none;">
 <div id="settings" class="col s12 app-content">
     <div class="section">
       <h5>Security</h5>
@@ -45,6 +48,7 @@
         <a href="https://github.com/shadow-paw/gh-html">Github</a>
       </div>
     </div></div></div>
+</div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
 </body>
