@@ -17,6 +17,7 @@ function logout_get(req: express.Request, res: express.Response) {
     const session = SessionData.bind(req.session);
     delete session.access_token;
     delete session.profile;
+    session.repo_whitelist = {};
     res.json({});
 }
 // EXPORTS

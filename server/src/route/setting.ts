@@ -17,7 +17,7 @@ module.exports = (function() {
 function setting_get(req: express.Request, res: express.Response) {
     // const self: AppServer = this;
     const session = SessionData.bind(req.session);
-    res.json({"restrict_repo": session.restrict_repo});
+    res.json({"repo_restrict": session.repo_restrict});
 }
 // -----------------------------------------------------------------
 /**
@@ -30,11 +30,11 @@ function setting_get(req: express.Request, res: express.Response) {
 function setting_patch(req: express.Request, res: express.Response) {
     // const self: AppServer = this;
     const session = SessionData.bind(req.session);
-    const restrict_repo = req.body["restrict_repo"];
-    if (typeof restrict_repo === "boolean") {
-        session.restrict_repo = restrict_repo as boolean;
+    const repo_restrict = req.body["repo_restrict"];
+    if (typeof repo_restrict === "boolean") {
+        session.repo_restrict = repo_restrict as boolean;
     }
-    res.json({"restrict_repo": session.restrict_repo});
+    res.json({"repo_restrict": session.repo_restrict});
 }
 // EXPORTS
 // -----------------------------------------------------------------

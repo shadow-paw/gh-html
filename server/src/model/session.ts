@@ -8,10 +8,12 @@ export class SessionData {
     public access_token: string;
     public profile: Profile;
     // Setting
-    public restrict_repo: boolean;
+    public repo_restrict: boolean;
+    public repo_whitelist: any;
 
     constructor() {
-        this.restrict_repo = true;
+        this.repo_restrict = true;
+        this.repo_whitelist = {};
     }
     static bind(session: any): SessionData {
         if (!("data" in session)) {

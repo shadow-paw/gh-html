@@ -64,8 +64,34 @@ export class GithubClient {
                 try {
                     profile = Profile.from(JSON.parse(body));
                 } catch (e) {
+                    // IGNORE
                 }
                 cb(profile);
+            }
+        });
+    }
+    is_collaborator(owner: string, repo: string, cb: ((result: boolean) => void)) {
+        const options = {
+            url: `https://api.github.com/repos/${owner}/${repo}`,
+            method: "GET",
+            headers: {
+                "Accept": "application/vnd.github.v3.raw",
+                "User-Agent": "shadow-paw/gh-html",
+                "Authorization": "token " + this.access_token
+            }
+        };
+        request(options, (err, response, body) => {
+            if (err || response.statusCode < 200 || response.statusCode >= 300) {
+                cb(false);
+            } else {
+                let result = false;
+                try {
+                    const json = JSON.parse(body);
+                    result = json["permissions"]["admin"] || json["permissions"]["push"];
+                } catch (e) {
+                    // IGNORE
+                }
+                cb(result);
             }
         });
     }

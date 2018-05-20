@@ -1,6 +1,6 @@
 var loginState = undefined;
 var settingState = {
-    "restrict_repo": true
+    "repo_restrict": true
 };
 
 
@@ -52,13 +52,13 @@ function login_ajax(){
 
 function setting_setup() {
     $("#setting_restrict").change(function(){
-        settingState.restrict_repo = this.checked;
+        settingState.repo_restrict = this.checked;
         setting_ajax();
     });
     setting_ajax();
 }
 function setting_updateUI(){
-    $("#setting_restrict").prop("checked", settingState.restrict_repo);
+    $("#setting_restrict").prop("checked", settingState.repo_restrict);
 }
 function setting_ajax() {
     $.ajax({
