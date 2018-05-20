@@ -1,18 +1,22 @@
 import * as request from "request";
 import * as qs from "query-string";
+import { Profile } from "./model/profile";
 
 
 export class GithubClient {
-    private token: string;
+    private client_id: string;
+    private client_secret: string;
+    private access_token: string;
 
-    constructor(access_token: string) {
-        this.token = access_token;
+    constructor(access_token?: string, client_id?: string, client_secret?: string) {
+        this.access_token = access_token;
+        this.client_id = client_id || process.env.APP_GH_CLIENTID;
+        this.client_secret = client_secret || process.env.APP_GH_SECRET;
     }
-    get_oauth_url(state: string): string {
-        const client_id = encodeURIComponent(process.env.APP_GH_OAUTH_CLIENTID);
-        const redirect = encodeURIComponent(process.env.APP_SERVER_BASE + "/auth-github");
-        const url = `https://github.com/login/oauth/authorize?scope=repo&client_id=${client_id}&redirect_uri=${redirect}&state=${state}`;
-        return url;
+    oauth_url(state: string): string {
+        const client_id = encodeURIComponent(this.client_id);
+        const redirect = encodeURIComponent(process.env.APP_SERVER_BASE + "/auth/github");
+        return `https://github.com/login/oauth/authorize?scope=repo&client_id=${client_id}&redirect_uri=${redirect}&state=${state}`;
     }
     get_access_token(code: string, state: string, cb: ((token: string) => void)) {
         const options = {
@@ -22,8 +26,8 @@ export class GithubClient {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             form: {
-                client_id: process.env.APP_GH_OAUTH_CLIENTID,
-                client_secret: process.env.APP_GH_OAUTH_SECRET,
+                client_id: this.client_id,
+                client_secret: this.client_secret,
                 code: code,
                 state: state
             }
@@ -34,14 +38,38 @@ export class GithubClient {
             } else {
                 const result = qs.parse(body);
                 if ("access_token" in result) {
-                    cb(result["access_token"]);
+                    this.access_token = result["access_token"];
+                    cb(this.access_token);
                 } else {
                     cb(undefined);
                 }
             }
         });
     }
-    user_file(owner: string, repo: string, branch: string, file: string, cb: ((code: number, data: any) => void)) {
+    get_me(cb: ((profile: Profile) => void)) {
+        const options = {
+            url: "https://api.github.com/user",
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "User-Agent": "shadow-paw/gh-html",
+                "Authorization": "token " + this.access_token
+            }
+        };
+        request(options, (err, response, body) => {
+            if (err || response.statusCode < 200 || response.statusCode >= 300) {
+                cb(undefined);
+            } else {
+                let profile: Profile = undefined;
+                try {
+                    profile = Profile.from(JSON.parse(body));
+                } catch (e) {
+                }
+                cb(profile);
+            }
+        });
+    }
+    get_user_file(owner: string, repo: string, branch: string, file: string, cb: ((code: number, data: any) => void)) {
         // console.log(`GITHUB GET FILE: owner: ${owner}, repo: ${repo}, branch: ${branch}, file: ${file}`);
         owner = encodeURIComponent(owner);
         repo = encodeURIComponent(repo);
@@ -54,7 +82,7 @@ export class GithubClient {
             headers: {
                 "Accept": "application/vnd.github.v3.raw",
                 "User-Agent": "shadow-paw/gh-html",
-                "Authorization": "token " + this.token
+                "Authorization": "token " + this.access_token
             }
         };
         request(options, (err, response, body) => {
