@@ -1,4 +1,8 @@
 var loginState = undefined;
+var settingState = {
+    "repo_restrict": true
+};
+
 
 function login_setup(){
     $("#login").click(function(){
@@ -17,6 +21,7 @@ function login_setup(){
             }
         });
     });
+    login_ajax();
 }
 function login_updateUI(){
     if (loginState) {
@@ -45,9 +50,35 @@ function login_ajax(){
     });
 }
 
+function setting_setup() {
+    $("#setting_restrict").change(function(){
+        settingState.repo_restrict = this.checked;
+        setting_ajax();
+    });
+    setting_ajax();
+}
+function setting_updateUI(){
+    $("#setting_restrict").prop("checked", settingState.repo_restrict);
+}
+function setting_ajax() {
+    $.ajax({
+        url: "rest/setting",
+        type: "PATCH",
+        contentType : 'application/json',
+        data: JSON.stringify(settingState),
+        success: function(data, status, xhr){
+            settingState = data;
+            setting_updateUI();
+        },
+        error: function() {
+            // TODO: resync
+        }
+    });
+}
+
 $(document).ready(function(){
     M.AutoInit();
     $("#body-content").show();
     login_setup();
-    login_ajax();
+    setting_setup();
 });

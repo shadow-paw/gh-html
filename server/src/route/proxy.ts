@@ -31,12 +31,35 @@ function proxy_get(req: express.Request, res: express.Response) {
         return;
     }
 
-    // Fetch content from github and return with correct mimetype
+    // parse url
     const fields = req.originalUrl.split("/");
     const owner = fields[2];
     const repo = fields[3];
     const branch = fields[4];
     const file = fields.slice(5).join("/");
+
+    // check whitelist
+    if (session.repo_restrict) {
+        const allowed = session.repo_whitelist[`${owner}/${repo}`];
+        if (allowed === undefined) {
+            const github = new GithubClient(session.access_token);
+            github.is_collaborator(owner, repo, (result: boolean) => {
+                session.repo_whitelist[`${owner}/${repo}`] = result;
+                if (result) {
+                    proxy_get_fetchfile(res, session, owner, repo, branch, file);
+                } else {
+                    res.status(403).send("Forbidden");
+                }
+            });
+        } else if (!allowed) {
+            res.status(403).send("Forbidden");
+        }
+    } else {
+        proxy_get_fetchfile(res, session, owner, repo, branch, file);
+    }
+}
+function proxy_get_fetchfile(res: express.Response, session: SessionData, owner: string, repo: string, branch: string, file: string) {
+    // Fetch content from github and return with correct mimetype
     const github = new GithubClient(session.access_token);
     github.get_user_file(owner, repo, branch, file, (code: number, data: any) => {
         if (data) {
@@ -47,6 +70,7 @@ function proxy_get(req: express.Request, res: express.Response) {
         }
     });
 }
+
 // EXPORTS
 // -----------------------------------------------------------------
 return {

@@ -68,6 +68,7 @@ export class AppServer {
                 case "post"  : this.app.post(uri, mod[method].bind(this)); break;
                 case "put"   : this.app.put(uri, mod[method].bind(this)); break;
                 case "delete": this.app.delete(uri, mod[method].bind(this)); break;
+                case "patch": this.app.patch(uri, mod[method].bind(this)); break;
                 }
             }
         });
