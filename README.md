@@ -8,6 +8,55 @@ On the other hand, for security reason `raw.githubusercontent.com` returns every
 1. Previewing html directly hosted on github.
 2. Have CI generate document and push on a particular branch, and enable you to view it.
 
+
+### Github OAuth App
+The server proxy files on github on your behalf, to do so it uses the github OAuth API and require an app registry on github. You need to create an OAuth App entry on https://github.com/settings/developers and setup the `Authorization callback URL` to match your server.  
+The URL shall be `$APP_SERVER_BASE/auth/github`, e.g. `https://www.example.com/gh-html/auth/github`.
+
+
+### Run as standalone
+The server is written as typescript and run with node.js. It also connect to a redis server for session store.  
+To run as standalone you need to [setup a redis server](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04).
+##### Configure server
+```
+cd server
+cp .env.example .env
+vi .env
+```
+Follow the comment in file for configuration detail.
+##### Starting server
+```
+cd server
+npm install
+make run
+```
+
+### Run with docker
+The server is written as typescript and run with node.js. It also connect to a redis server for session store.  
+The docker-compose.yml setup these two images.
+##### Configure server
+```
+cd server
+vi docker-compose.override.yml
+```
+Override required configures, your `docker-compose.override.yml` should looks like this:
+```
+version: '3'
+services:
+    app:
+        environment:
+            APP_SERVER_BASE: https://www.example.com/gh-html
+            APP_SESSION_SECRET: secret
+            APP_GH_CLIENTID: 1234567890
+            APP_GH_SECRET: 1234567890
+```
+##### Starting server
+```
+cd server
+docker-compose build
+docker-compose up -d
+```
+
 ### Security Disclaimer
 `gh-html` is intended for use with trusted content, while having standard practice in mind, the mechanism that it proxy multiple repositories under same URL means things like cookies are shared. It should not be used to preview untrusted or random public content. Doing so might put you at certain security risk, or the computer would just explode.  
 To preview public repository just visit https://htmlpreview.github.io/
