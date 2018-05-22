@@ -17,7 +17,11 @@ module.exports = (function() {
 function me_get(req: express.Request, res: express.Response) {
     // const self: AppServer = this;
     const session = SessionData.bind(req.session);
-    res.json(session.profile);
+    if (session.profile) {
+        res.json(session.profile);
+    } else {
+        res.status(403).json({"error": "UNAUTHORIZED"});
+    }
 }
 // EXPORTS
 // -----------------------------------------------------------------
