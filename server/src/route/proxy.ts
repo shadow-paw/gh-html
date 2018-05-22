@@ -1,6 +1,7 @@
 import * as express from "express";
 import * as mime from "mime-types";
 import * as crypto from "crypto";
+import * as async from "async";
 import { AppServer } from "../server";
 import { GithubClient } from "../github";
 import { SessionData } from "../model/session";
@@ -8,6 +9,37 @@ import { SessionData } from "../model/session";
 
 module.exports = (function() {
 // -----------------------------------------------------------------
+function repo_access_allowed(session: SessionData, owner: string, repo: string, cb: ((allowed: boolean) => void)) {
+    if (session.repo_restrict) {
+        const isallowed = session.repo_whitelist[`${owner}/${repo}`];
+        if (isallowed === undefined) {
+            const github = new GithubClient(session.access_token);
+            async.parallel({
+                is_private: (callback: any) => {
+                    github.is_private(owner, repo, (isprivate: boolean) => {
+                        callback(undefined, isprivate);
+                    });
+                },
+                is_collaborator: (callback: any) => {
+                    github.is_collaborator(session.profile.name, owner, repo, (iscollaborator: boolean) => {
+                        callback(undefined, iscollaborator);
+                    });
+                }
+            }, (err, results) => {
+                const is_private = results["is_private"] as boolean;
+                const is_collaborator = results["is_collaborator"] as boolean;
+                const allowed = (is_private || (!is_private && is_collaborator));
+                session.repo_whitelist[`${owner}/${repo}`] = allowed;
+                cb(allowed);
+            });
+        } else {
+            cb(isallowed);
+        }
+    } else {
+        cb(true);
+    }
+}
+
 /**
  * @api {get} /proxy/{owner}/{repo}/{branch}/{path}/{file} Access repo file
  * @apiVersion 0.0.1
@@ -39,24 +71,13 @@ function proxy_get(req: express.Request, res: express.Response) {
     const file = fields.slice(5).join("/");
 
     // check whitelist
-    if (session.repo_restrict) {
-        const allowed = session.repo_whitelist[`${owner}/${repo}`];
-        if (allowed === undefined) {
-            const github = new GithubClient(session.access_token);
-            github.is_collaborator(owner, repo, (result: boolean) => {
-                session.repo_whitelist[`${owner}/${repo}`] = result;
-                if (result) {
-                    proxy_get_fetchfile(res, session, owner, repo, branch, file);
-                } else {
-                    res.status(403).send("Forbidden");
-                }
-            });
-        } else if (!allowed) {
+    repo_access_allowed(session, owner, repo, (allowed: boolean) => {
+        if (allowed) {
+            proxy_get_fetchfile(res, session, owner, repo, branch, file);
+        } else {
             res.status(403).send("Forbidden");
         }
-    } else {
-        proxy_get_fetchfile(res, session, owner, repo, branch, file);
-    }
+    });
 }
 function proxy_get_fetchfile(res: express.Response, session: SessionData, owner: string, repo: string, branch: string, file: string) {
     // Fetch content from github and return with correct mimetype

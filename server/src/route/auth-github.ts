@@ -6,6 +6,7 @@ import * as crypto from "crypto";
 import { AppServer } from "../server";
 import { GithubClient } from "../github";
 import { SessionData } from "../model/session";
+import { Profile } from "../model/profile";
 
 
 module.exports = (function() {
@@ -29,8 +30,16 @@ function auth_github(req: express.Request, res: express.Response) {
                 const returning_url = session.returning_url || "../";
                 delete session.oauth_state;
                 delete session.returning_url;
-                session.access_token = access_token;
-                res.redirect(returning_url);
+                // get profile
+                github.get_me((profile: Profile) => {
+                    if (!profile) {
+                        res.status(401).json({"error": "UNAUTHORIZED"});
+                    } else {
+                        session.access_token = access_token;
+                        session.profile = profile;
+                        res.redirect(returning_url);
+                    }
+                });
             } else {
                 res.status(403).send("error");
             }

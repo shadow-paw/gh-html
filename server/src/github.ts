@@ -70,12 +70,12 @@ export class GithubClient {
             }
         });
     }
-    is_collaborator(owner: string, repo: string, cb: ((result: boolean) => void)) {
+    is_private(owner: string, repo: string, cb: ((isprivate: boolean) => void)) {
         const options = {
             url: `https://api.github.com/repos/${owner}/${repo}`,
             method: "GET",
             headers: {
-                "Accept": "application/vnd.github.v3.raw",
+                "Accept": "application/json",
                 "User-Agent": "shadow-paw/gh-html",
                 "Authorization": "token " + this.access_token
             }
@@ -84,14 +84,32 @@ export class GithubClient {
             if (err || response.statusCode < 200 || response.statusCode >= 300) {
                 cb(false);
             } else {
-                let result = false;
+                let isprivate = false;
                 try {
                     const json = JSON.parse(body);
-                    result = json["permissions"]["admin"] || json["permissions"]["push"];
+                    isprivate = json["private"] as boolean;
                 } catch (e) {
                     // IGNORE
                 }
-                cb(result);
+                cb(isprivate);
+            }
+        });
+    }
+    is_collaborator(user: string, owner: string, repo: string, cb: ((iscollaborator: boolean) => void)) {
+        const options = {
+            url: `https://api.github.com/repos/${owner}/${repo}/collaborators/${user}`,
+            method: "GET",
+            headers: {
+                "Accept": "application/vnd.github.hellcat-preview+json",
+                "User-Agent": "shadow-paw/gh-html",
+                "Authorization": "token " + this.access_token
+            }
+        };
+        request(options, (err, response, body) => {
+            if (err || response.statusCode < 200 || response.statusCode >= 300) {
+                cb(false);
+            } else {
+                cb(true);
             }
         });
     }
