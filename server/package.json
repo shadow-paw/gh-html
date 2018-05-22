@@ -18,6 +18,7 @@
     "lint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
+    "async": "^2.6.1",
     "body-parser": "^1.18.3",
     "connect-redis": "^3.3.3",
     "dotenv": "^5.0.1",
@@ -29,6 +30,7 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
+    "@types/async": "^2.0.49",
     "@types/body-parser": "^1.17.0",
     "@types/connect-redis": "0.0.7",
     "@types/dotenv": "^4.0.3",

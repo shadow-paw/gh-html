@@ -17,19 +17,7 @@ module.exports = (function() {
 function me_get(req: express.Request, res: express.Response) {
     // const self: AppServer = this;
     const session = SessionData.bind(req.session);
-    if (!session.profile) {
-        const github = new GithubClient(session.access_token);
-        github.get_me((profile: Profile) => {
-            if (!profile) {
-                res.status(401).json({"error": "UNAUTHORIZED"});
-            } else {
-                session.profile = profile;
-                res.json(profile);
-            }
-        });
-    } else {
-        res.json(session.profile);
-    }
+    res.json(session.profile);
 }
 // EXPORTS
 // -----------------------------------------------------------------
