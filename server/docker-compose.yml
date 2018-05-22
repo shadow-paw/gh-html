@@ -1,0 +1,29 @@
+version: '3'
+services:
+    redis:
+        image: redis:4.0.9-alpine
+    app:
+        container_name: gh-html-server
+        image: node:9.10.0-alpine
+        ports:
+            - 8080:8080
+        working_dir: /usr/app/
+        volumes:
+            - .:/usr/app
+            - /usr/app/node_modules
+        command: sh -c "npm install && npm run lint && npm run build && npm run dev"
+        environment:
+            # APP_SERVER_THREADS defaults to match available cpu/core
+            # APP_SERVER_THREADS: 1
+            APP_SERVER_PORT: 8080
+            APP_REDIS: redis://:@redis:6379/0
+            # APP_SERVER_BASE is the base URL from your nginx proxy
+            #   e.g. https://gh-html.example.com
+            #   e.g. https://www.example.com/gh-html
+            APP_SERVER_BASE: REPLACE_ME
+            # APP_SESSION_SECRET for express session
+            APP_SESSION_SECRET: REPLACE_ME
+            # Github OAuth app settings
+            # To create your app, https://github.com/settings/developers
+            APP_GH_CLIENTID: REPLACE_ME
+            APP_GH_SECRET: REPLACE_ME
