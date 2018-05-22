@@ -1,8 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as URL from "url";
 import * as express from "express";
-import * as session from "express-session";
+import * as express_session from "express-session";
 import * as bodyParser from "body-parser";
+import * as redis from "redis";
+import * as redisConnect from "connect-redis";
 
 
 export class AppServer {
@@ -12,50 +15,65 @@ export class AppServer {
 
     constructor(id: number) {
         this.id = id;
-        this.port = 8080;
         if (process.env.APP_SERVER_PORT) {
             this.port = parseInt(process.env.APP_SERVER_PORT);
+        } else {
+            this.port = 8080;
         }
         // -------------------------------------------------------------
         // SETUP EXPRESS
         // -------------------------------------------------------------
         this.app = express();
+        this.app.set("trust proxy", 1);
+        // session
+        // -------------------------------------------------------------
+        const session_options: any = {
+            secret: process.env.APP_SESSION_SECRET,
+            resave: false,
+            saveUninitialized: true,
+            cookie: {
+                maxAge: 60000,
+                secure: (this.app.get("env") === "production")
+            }
+        };
+        // redis
+        if (process.env.APP_REDIS) {
+            const url = URL.parse(process.env.APP_REDIS);
+            // const user = url.auth.split(':')[0];
+            const host = url.hostname;
+            const port = parseInt(url.port);
+            const db = parseInt(url.path.substring(1) || "0");
+            const pass = url.auth.split(":")[1];
+            const redisStore = redisConnect(express_session);
+            const store = new redisStore({
+                db: db,
+                pass: pass,
+                client: redis.createClient({
+                    host: host,
+                    port: port
+                }),
+                ttl: 86400
+            });
+            session_options.store = store;
+        }
+        this.app.use(express_session(session_options));
         this.app.use(bodyParser.json())
                 .use(express.static("html"));
-        // TODO: redis for session store
-        if (this.app.get("env") === "production") {
-            this.app.set("trust proxy", 1);
-            this.app.use(session({
-                secret: process.env.APP_SESSION_SECRET,
-                resave: false,
-                saveUninitialized: true,
-                cookie: {
-                    maxAge: 60000,
-                    secure: true
-                }
-            }));
-        } else {
-            this.app.use(session({
-                secret: process.env.APP_SESSION_SECRET,
-                resave: false,
-                saveUninitialized: true,
-                cookie: {
-                    maxAge: 60000
-                }
-            }));
-        }
         // Remove useless header
+        // -------------------------------------------------------------
         this.app.use(function (req: express.Request, res: express.Response, next: any) {
             res.removeHeader("X-Powered-By");
             next();
         });
         // Handle bad JSON request
+        // -------------------------------------------------------------
         this.app.use(function(err: any, req: express.Request, res: express.Response, next: any) {
             if ((err.status === 400) && ("body" in err) && (err instanceof SyntaxError)) {
                 res.status(403).json({"error": "INVALID_PARAM"});
             }
         });
         // Register URI Handlers
+        // -------------------------------------------------------------
         fs.readdirSync(path.join(__dirname, "./route"))
           .filter(file => file.endsWith(".js"))
           .forEach((module) => {

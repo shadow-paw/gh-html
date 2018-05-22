@@ -18,24 +18,27 @@
     "lint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
-    "body-parser": "^1.18.2",
+    "body-parser": "^1.18.3",
+    "connect-redis": "^3.3.3",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "mime-types": "^2.1.18",
-    "query-string": "^6.0.0",
-    "request": "^2.85.0"
+    "query-string": "^6.1.0",
+    "request": "^2.87.0",
+    "url": "^0.11.0"
   },
   "devDependencies": {
-    "@types/body-parser": "^1.16.8",
+    "@types/body-parser": "^1.17.0",
+    "@types/connect-redis": "0.0.7",
     "@types/dotenv": "^4.0.3",
     "@types/express": "^4.11.1",
     "@types/express-session": "^1.15.8",
     "@types/mime-types": "^2.1.0",
     "@types/query-string": "^5.1.0",
     "@types/request": "^2.47.0",
-    "ts-node": "^5.0.1",
-    "tslint": "^5.9.1",
-    "typescript": "^2.8.1"
+    "ts-node": "^6.0.3",
+    "tslint": "^5.10.0",
+    "typescript": "^2.8.3"
   }
 }

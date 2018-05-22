@@ -53,14 +53,24 @@ function login_ajax(){
 function setting_setup() {
     $("#setting_restrict").change(function(){
         settingState.repo_restrict = this.checked;
-        setting_ajax();
+        setting_ajax_patch();
     });
-    setting_ajax();
+    setting_ajax_get();
 }
 function setting_updateUI(){
     $("#setting_restrict").prop("checked", settingState.repo_restrict);
 }
-function setting_ajax() {
+function setting_ajax_get() {
+    $.ajax({
+        url: "rest/setting",
+        type: "GET",
+        success: function(data, status, xhr){
+            settingState = data;
+            setting_updateUI();
+        }
+    });
+}
+function setting_ajax_patch() {
     $.ajax({
         url: "rest/setting",
         type: "PATCH",
