@@ -64,7 +64,7 @@ function proxy_get(req: express.Request, res: express.Response) {
     }
 
     // parse url
-    const fields = req.originalUrl.split("/");
+    const fields = req.originalUrl.split("?").shift().split("/");
     const owner = fields[2];
     const repo = fields[3];
     const branch = fields[4];
