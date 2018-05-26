@@ -1,5 +1,6 @@
 import * as request from "request";
 import * as qs from "query-string";
+import { APPCONFIG } from "./appconfig";
 import { Profile } from "./model/profile";
 
 
@@ -10,12 +11,12 @@ export class GithubClient {
 
     constructor(access_token?: string, client_id?: string, client_secret?: string) {
         this.access_token = access_token;
-        this.client_id = client_id || process.env.APP_GH_CLIENTID;
-        this.client_secret = client_secret || process.env.APP_GH_SECRET;
+        this.client_id = client_id || APPCONFIG.gh_clientid;
+        this.client_secret = client_secret || APPCONFIG.gh_secret;
     }
     oauth_url(state: string): string {
         const client_id = encodeURIComponent(this.client_id);
-        const redirect = encodeURIComponent(process.env.APP_SERVER_BASE + "/auth/github");
+        const redirect = encodeURIComponent(APPCONFIG.server_base + "/auth/github");
         return `https://github.com/login/oauth/authorize?scope=repo&client_id=${client_id}&redirect_uri=${redirect}&state=${state}`;
     }
     get_access_token(code: string, state: string, cb: ((token: string) => void)) {
