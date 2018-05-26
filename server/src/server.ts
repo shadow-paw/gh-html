@@ -6,6 +6,7 @@ import * as express_session from "express-session";
 import * as bodyParser from "body-parser";
 import * as redis from "redis";
 import * as redisConnect from "connect-redis";
+import { APPCONFIG } from "./appconfig";
 
 
 export class AppServer {
@@ -15,11 +16,7 @@ export class AppServer {
 
     constructor(id: number) {
         this.id = id;
-        if (process.env.APP_SERVER_PORT) {
-            this.port = parseInt(process.env.APP_SERVER_PORT);
-        } else {
-            this.port = 8080;
-        }
+        this.port = APPCONFIG.server_port;
         // -------------------------------------------------------------
         // SETUP EXPRESS
         // -------------------------------------------------------------
@@ -28,17 +25,17 @@ export class AppServer {
         // session
         // -------------------------------------------------------------
         const session_options: any = {
-            secret: process.env.APP_SESSION_SECRET,
+            secret: APPCONFIG.session_secret,
             resave: false,
             saveUninitialized: true,
             cookie: {
-                maxAge: 60000,
+                maxAge: APPCONFIG.session_ttl,
                 secure: (this.app.get("env") === "production")
             }
         };
         // redis
-        if (process.env.APP_REDIS) {
-            const url = URL.parse(process.env.APP_REDIS);
+        if (APPCONFIG.redis) {
+            const url = URL.parse(APPCONFIG.redis);
             // const user = url.auth.split(':')[0];
             const host = url.hostname;
             const port = parseInt(url.port);
@@ -52,7 +49,7 @@ export class AppServer {
                     host: host,
                     port: port
                 }),
-                ttl: 86400
+                ttl: APPCONFIG.session_ttl
             });
             session_options.store = store;
         }
