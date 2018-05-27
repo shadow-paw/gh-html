@@ -1,11 +1,11 @@
-FROM node:9.10.0-alpine
+FROM node:9.11-alpine
 
-WORKDIR /usr/src/app
-COPY package*.json /usr/src/app/
+WORKDIR /usr/app
+COPY package.json package-lock.json /usr/app/
 
 RUN npm install
 
-COPY . /usr/src/app
+COPY . /usr/app
 
 RUN npm run build
 

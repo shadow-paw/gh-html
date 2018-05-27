@@ -39,7 +39,7 @@
     "@types/mime-types": "^2.1.0",
     "@types/query-string": "^5.1.0",
     "@types/request": "^2.47.0",
-    "ts-node": "^6.0.3",
+    "ts-node": "^6.0.5",
     "tslint": "^5.10.0",
     "typescript": "^2.8.3"
   }
