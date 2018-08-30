@@ -68,5 +68,5 @@ class AppConfig {
     }
 }
 
-const APPCONFIG = AppConfig.from_env();
+const APPCONFIG = AppConfig.from_env(false);
 export { APPCONFIG };
