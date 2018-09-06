@@ -1,7 +1,7 @@
 {
-    "name": "Messenger",
+    "name": "gh-html",
     "version": "0.0.1",
-    "description": "Secure messenger for everyone",
+    "description": "gh-pages alike for private repo",
     "template": {
         "forceLanguage": "en"
     }
