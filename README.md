@@ -34,22 +34,7 @@ make run
 ### Run with docker
 The server is written as typescript and run with node.js. It also connect to a redis server for session store.  
 The docker-compose.yml setup these two images.
-##### Configure server
-```
-cd server
-vi docker-compose.override.yml
-```
-Override required configures, your `docker-compose.override.yml` should looks like this:
-```
-version: '3'
-services:
-    app:
-        environment:
-            APP_SERVER_BASE: https://www.example.com/gh-html
-            APP_SESSION_SECRET: secret
-            APP_GH_CLIENTID: 1234567890
-            APP_GH_SECRET: 1234567890
-```
+
 ##### Starting server
 ```
 cd server
