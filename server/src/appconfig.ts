@@ -11,6 +11,9 @@ class AppConfig {
     public gh_clientid: string;
     public gh_secret: string;
 
+    private static instance = AppConfig.from_env(true);
+    public static getInstance = () => AppConfig.instance;
+
     static from_env(delete_secret: boolean = true): AppConfig {
         const config = new AppConfig();
         if (process.env.APP_THREADS) {
@@ -68,5 +71,5 @@ class AppConfig {
     }
 }
 
-const APPCONFIG = AppConfig.from_env(false);
+const APPCONFIG = AppConfig.getInstance();
 export { APPCONFIG };
