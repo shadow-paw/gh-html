@@ -1,0 +1,11 @@
+*.pem
+*.p12
+*.crt
+*.cert
+
+node_modules/
+dist/
+*.d.ts
+docker-compose.yml
+docker-compose.override.yml
+.env

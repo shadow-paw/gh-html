@@ -1,27 +1,26 @@
 version: '3'
 services:
-    redis:
-        container_name: gh-html-redis
-        image: redis:4.0.9-alpine
-        command: redis-server --requirepass "$REDIS_PASS"
-        environment:
-            REDIS_PASS: "$REDIS_PASS"
-    app:
-        container_name: gh-html-server
-        image: node:9.11-alpine
-        ports:
-            - 8080:8080
-        depends_on:
-            - redis
-        volumes:
-            - .:/usr/app
-            - /usr/app/node_modules
-        working_dir: /usr/app/
-        command: sh -c "npm install && npm run lint && npm run build && npm run dev"
-        environment:
-            APP_SERVER_PORT: 8080
-            APP_REDIS: "redis://:$REDIS_PASS@redis:6379/0"
-            APP_SERVER_BASE: "$APP_SERVER_BASE"
-            APP_SESSION_SECRET: "$APP_SESSION_SECRET"
-            APP_GH_CLIENTID: "$APP_GH_CLIENTID"
-            APP_GH_SECRET: "$APP_GH_SECRET"
+  redis:
+    image: redis:5.0.3-alpine
+    command: redis-server --requirepass "$REDIS_PASS"
+    ports:
+      - 6379
+    environment:
+      - REDIS_PASS=${REDIS_PASS}
+  app:
+    image: node:11.9.0-alpine
+    working_dir: /usr/app/
+    command: npm run lint-rebuild-dev
+    depends_on:
+      - redis
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/usr/app
+    environment:
+      - APP_SERVER_PORT=8080
+      - APP_REDIS=redis://:${REDIS_PASS}@redis:6379/0
+      - APP_SERVER_BASE=${APP_SERVER_BASE}
+      - APP_SESSION_SECRET=${APP_SESSION_SECRET}
+      - APP_GH_CLIENTID=${APP_GH_CLIENTID}
+      - APP_GH_SECRET=${APP_GH_SECRET}
