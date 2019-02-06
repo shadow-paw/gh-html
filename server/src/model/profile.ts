@@ -2,7 +2,7 @@ export class Profile {
     public user_id: number;
     public name: string;
 
-    static from(json: any): Profile {
+    static fromJson(json: any): Profile {
         const profile = new Profile();
         profile.user_id = json["id"] as number;
         profile.name = json["login"] as string;

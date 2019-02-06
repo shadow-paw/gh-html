@@ -63,7 +63,7 @@ export class GithubClient {
             } else {
                 let profile: Profile = undefined;
                 try {
-                    profile = Profile.from(JSON.parse(body));
+                    profile = Profile.fromJson(JSON.parse(body));
                 } catch (e) {
                     // IGNORE
                 }
