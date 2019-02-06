@@ -39,7 +39,7 @@ export class GithubClient {
             } else {
                 const result = qs.parse(body);
                 if ("access_token" in result) {
-                    this.access_token = result["access_token"];
+                    this.access_token = result["access_token"] as string;
                     cb(this.access_token);
                 } else {
                     cb(undefined);

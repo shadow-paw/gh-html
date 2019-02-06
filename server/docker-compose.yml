@@ -8,9 +8,9 @@ services:
     environment:
       - REDIS_PASS=${REDIS_PASS}
   app:
-    image: node:11.9.0-alpine
+    build: .
+    command: sh -c "npm install && npm run lint && npm run clean && npm run build && npm run dev"
     working_dir: /usr/app/
-    command: npm run lint-rebuild-dev
     depends_on:
       - redis
     ports:
