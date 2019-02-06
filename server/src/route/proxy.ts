@@ -2,7 +2,7 @@ import * as express from "express";
 import * as mime from "mime-types";
 import * as crypto from "crypto";
 import * as async from "async";
-import { APPCONFIG } from "../appconfig";
+import { appConfig } from "../appconfig";
 import { AppServer } from "../server";
 import { GithubClient } from "../github";
 import { SessionData } from "../model/session";
@@ -55,7 +55,7 @@ function proxy_get(req: express.Request, res: express.Response) {
 
     if (!session.access_token) {
         // Redirect to github oauth if not logged in already
-        session.returning_url = APPCONFIG.server_base + req.originalUrl;
+        session.returning_url = appConfig.server_base + req.originalUrl;
         const github = new GithubClient();
         const secret = crypto.randomBytes(16);
         const oauth_state = Buffer.from(secret).toString("hex");
