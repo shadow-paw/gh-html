@@ -73,9 +73,9 @@ export class AppServer {
         // -------------------------------------------------------------
         fs.readdirSync(path.join(__dirname, "./route"))
           .filter(file => file.endsWith(".js"))
-          .forEach((module) => {
-             const mod = require("./route/" + module);
-             const uri = mod["uri"] || "/" + module.slice(0, -path.extname(module).length);
+          .forEach((file) => {
+             const mod = require("./route/" + file);
+             const uri = mod["uri"] || "/" + file.slice(0, -path.extname(file).length);
              console.log(`[D] Register URI: ${uri}`);
              for (const method of Object.keys(mod)) {
                 switch (method) {
