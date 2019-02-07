@@ -22,6 +22,8 @@ export class AppServer {
         // -------------------------------------------------------------
         this.app = express();
         this.app.set("trust proxy", 1);
+        this.app.set("etag", false);
+        this.app.set("x-powered-by", false);
         // session
         // -------------------------------------------------------------
         const session_options: any = {
@@ -56,12 +58,6 @@ export class AppServer {
         this.app.use(express_session(session_options));
         this.app.use(bodyParser.json())
                 .use(express.static("html"));
-        // Remove useless header
-        // -------------------------------------------------------------
-        this.app.use(function (req: express.Request, res: express.Response, next: any) {
-            res.removeHeader("X-Powered-By");
-            next();
-        });
         // Handle bad JSON request
         // -------------------------------------------------------------
         this.app.use(function(err: any, req: express.Request, res: express.Response, next: any) {
