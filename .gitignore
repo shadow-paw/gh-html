@@ -72,5 +72,7 @@ apidoc/
 
 *.pem
 *.p12
+*.pfx
 *.crt
 *.cert
+*.key

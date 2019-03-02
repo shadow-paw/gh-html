@@ -1,5 +1,7 @@
+.env
+.env.bak
+.env.tmp
+docker-compose.override.yml
+
 node_modules/
 dist/
-*.pem
-*.d.ts
-docker-compose.override.yml
