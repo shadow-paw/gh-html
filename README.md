@@ -9,40 +9,41 @@ On the other hand, for security reason `raw.githubusercontent.com` returns every
 2. Have CI generate document and push on a particular branch, and enable you to view it.
 
 
-### Github OAuth App
+## Github OAuth App
 The server proxy files on github on your behalf, to do so it uses the github OAuth API and require an app registry on github. You need to create an OAuth App entry on https://github.com/settings/developers and setup the `Authorization callback URL` to match your server.  
 The URL shall be `$APP_SERVER_BASE/auth/github`, e.g. `https://www.example.com/gh-html/auth/github`.
 
 
-### Run as standalone
-The server is written as typescript and run with node.js. It also connect to a redis server for session store.  
-To run as standalone you need to [setup a redis server](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04).
-##### Configure server
+## Initial Configuration
 ```
 cd server
-cp .env.example .env
+# generate secrets
+make secret-reset
+# adjust settings like github app id
 vi .env
 ```
-Follow the comment in file for configuration detail.
-##### Starting server
+> Follow the comment in file for configuration detail.
+
+## Running
+#### Run as standalone
+The server is written as typescript and run with node.js. It also connect to a redis server for session store.  
+To run as standalone you need to [setup a redis server](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04).
 ```
 cd server
 npm install
 make run
 ```
 
-### Run with docker
+#### Run with docker
 The server is written as typescript and run with node.js. It also connect to a redis server for session store.  
 The docker-compose.yml setup these two images.
-
-##### Starting server
 ```
 cd server
 docker-compose build
 docker-compose up -d
 ```
 
-### Security Disclaimer
+## Security Disclaimer
 `gh-html` is intended for use with trusted content, while having standard practice in mind, the mechanism that it proxy multiple repositories under same URL means things like cookies are shared. It should not be used to preview untrusted or random public content. Doing so might put you at certain security risk, or the computer would just explode.  
 To preview public repository just visit https://htmlpreview.github.io/
 

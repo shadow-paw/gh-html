@@ -1,13 +1,23 @@
-.PHONY: run lint build apidoc
+.PHONY: lint build run clean apidoc secret-reset
 
-run: build
-	npm run dev
+
+all: build
+	@:
 
 lint:
-	npm run lint
+	@npm run lint
 
 build: lint
-	npm run build
+	@npm run build
+
+run: build
+	@npm run dev
+
+clean:
+	@-npm run clean
 
 apidoc:
-	apidoc -i src -o ../apidoc/
+	@apidoc -i src -o ../apidoc/
+
+secret-reset:
+	@script/secret-gen.sh
