@@ -24,7 +24,7 @@ function auth_github(req: express.Request, res: express.Response) {
 
     // const self: AppServer = this;
     if ("code" in req.query) {
-        const code = req.query.code;
+        const code = req.query.code as string;
         github.get_access_token(code, session.oauth_state, (access_token: string) => {
             if (access_token) {
                 const returning_url = session.returning_url || "../";
