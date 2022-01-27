@@ -49,7 +49,8 @@ export class AppServer {
                 pass: pass,
                 client: redis.createClient({
                     host: host,
-                    port: port
+                    port: port,
+                    auth_pass: pass,
                 }),
                 ttl: config.session_ttl
             });

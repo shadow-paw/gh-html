@@ -1,4 +1,4 @@
-FROM node:11.9.0-alpine
+FROM node:17.4.0-buster-slim
 
 RUN npm install -g npm
 

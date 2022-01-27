@@ -1,7 +1,7 @@
 version: '3'
 services:
   redis:
-    image: redis:5.0.3-alpine
+    image: redis:6.2.6-bullseye
     command: redis-server --requirepass "$REDIS_PASS"
     ports:
       - 6379
